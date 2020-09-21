@@ -77,6 +77,8 @@ static int __init hello_init(void)
 /*6.有入口函数就应该有出口函数：卸载驱动程序时，寄回去调用这个出口函数*/
 static void __exit hello_exit(void)
 {
+    device_destroy(hello_class,MKDEV(major,0));
+    class_destory(hello_class);
     unregister_chrdev(major,"hello");
 }
 /*7.其他完善：提供设备信息，自动创建设备节点*/
