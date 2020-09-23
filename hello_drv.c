@@ -21,18 +21,21 @@ static char kernel_buf[1024];
 static struct class *hello_class;
 
 #define MIN(a,b) (a<b?a:b)
+
 /*3.实现对应的open/read/write等函数，填入file_operations结构体*/
 static ssize_t hello_drv_read (struct file *file, char __user *buf, size_t size, loff_t *offset)
 {
+    int err;
     printk("%s %s line %d\n",__FILE__,__FUNCTION__,__LINE__);
-    copy_to_user(buf,kernel_buf,MIN(1024,size));
+    err= copy_to_user(buf,kernel_buf,MIN(1024,size));
     return MIN(1024,size);
 }
 
 static ssize_t hello_drv_write (struct file *file, const char __user *buf, size_t size, loff_t *offset)
 {
+    int err;
     printk("%s %s line %d\n",__FILE__,__FUNCTION__,__LINE__);
-    copy_from_user(kernel_buf,buf,MIN(1024,size));/*从用户空间拷贝到驱动程序中定义的buffer中来*/
+    err= copy_from_user(kernel_buf,buf,MIN(1024,size));/*从用户空间拷贝到驱动程序中定义的buffer中来*/
     return MIN(1024,size);
 }
 
