@@ -62,7 +62,8 @@ static struct file_operations hello_drv
 /*5.谁来注册驱动程序呀？得有一个入口函数：安装驱动程序时，就会去调用这个入口函数*/
 static int __init hello_init(void)
 {
-    register_chrdev(0,"hello",&hello_drv);/*/dev/hello*/
+    int err;
+    register_chrdev(0,"hello",&hello_drv);      /*应用程序想要访问该驱动程序需要通过这个设备节点/dev/hello*/
     hello_class=class_create(THIS_MODULE,"hello");
     err=PTR_ERR(hello_class);
     if(IS_ERR(hello_class))
@@ -70,19 +71,19 @@ static int __init hello_init(void)
         unregister_chrdev(major,"hello");
         return -1;
     }
-    device_create(hello_class,NULL,MKDEV(major,0),NULL,"hello");/*/dev/hello*/
+    device_create(hello_class,NULL,MKDEV(major,0),NULL,"hello");/*创建设备节点/dev/hello*/
     return 0;
 }
 
-/*6.有入口函数就应该有出口函数：卸载驱动程序时，寄回去调用这个出口函数*/
+/*6.有入口函数就应该有出口函数：卸载驱动程序时，寄回去调用这个出口函数  */
 static void __exit hello_exit(void)
 {
-    device_destroy(hello_class,MKDEV(major,0));
+    device_destroy(hello_class,MKDEV(major,0)); /* 销毁设备节点 */
     class_destory(hello_class);
     unregister_chrdev(major,"hello");
 }
 /*7.其他完善：提供设备信息，自动创建设备节点*/
-module_init(hello_init);
-module_exit(hello_exit);
+module_init(hello_init);    /*把hello_init修饰成入口函数*/
+module_exit(hello_exit);    /*把hello_exit修饰成出口函数*/
 
-MODULE_LICENSE("GPL");
+MODULE_LICENSE("GPL");      /*驱动程序遵守GPL协议*/
